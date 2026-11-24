@@ -1,0 +1,60 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Environment variables & secrets
+.env
+.streamlit/secrets.toml
+
+# Logs, temporary runs and local MLflow artifacts
+logs/
+*.log
+mlruns/
+*.sqlite3
+data/mlflow.db
+
+# Large raw event logs (keep compact demo database and processed parquet)
+data/raw/
+data/customer_intelligence.db
+data/processed/*.csv
+data/power_bi_exports/Fact_WebsiteSessions.csv
+
+# Ensure demo database and lightweight processed artifacts are preserved
+!data/customer_intelligence_demo.db
+!data/processed/*.parquet
+!models/*.joblib
+!models/*.json
+!models/*.parquet
+
+# OS generated files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,10 @@
+{
+    "target": "future_12m_revenue",
+    "model_architecture": "GradientBoostingRegressor",
+    "r2_score": 0.7276,
+    "rmse": 1866.0,
+    "mae": 645.22,
+    "mean_actual_future_12m": 1091.95,
+    "mean_pred_future_12m": 1000.47,
+    "modeling_notes": "Predicts future 12-month forward spend. Target is not leaked into input features."
+}

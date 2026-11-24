@@ -1,0 +1,50 @@
+{
+    "overall_status": "HEALTHY_STABLE",
+    "max_psi": 0.067,
+    "baseline_samples": 5000,
+    "batch_samples": 1750,
+    "feature_drifts": [
+        {
+            "feature": "spend_per_tenure_month",
+            "ks_statistic": 0.0151,
+            "p_value": 0.9226,
+            "psi": 0.0026,
+            "status": "STABLE"
+        },
+        {
+            "feature": "avg_session_duration",
+            "ks_statistic": 0.0636,
+            "p_value": 0.0001,
+            "psi": 0.042,
+            "status": "DRIFT_DETECTED"
+        },
+        {
+            "feature": "days_since_last_session",
+            "ks_statistic": 0.1929,
+            "p_value": 0.0,
+            "psi": 0.067,
+            "status": "DRIFT_DETECTED"
+        },
+        {
+            "feature": "avg_csat_score",
+            "ks_statistic": 0.0092,
+            "p_value": 0.9999,
+            "psi": 0.0008,
+            "status": "STABLE"
+        },
+        {
+            "feature": "total_tickets",
+            "ks_statistic": 0.0063,
+            "p_value": 1.0,
+            "psi": 0.0001,
+            "status": "STABLE"
+        },
+        {
+            "feature": "bounce_rate",
+            "ks_statistic": 0.014,
+            "p_value": 0.9578,
+            "psi": 0.001,
+            "status": "STABLE"
+        }
+    ]
+}

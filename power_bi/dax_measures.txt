@@ -1,0 +1,187 @@
+// ============================================================================
+// Customer Intelligence, Churn, LTV & Retention Optimization Engine
+// Complete Production DAX Measures Repository for Microsoft Power BI
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// 1. REVENUE & FINANCIAL MEASURES
+// ----------------------------------------------------------------------------
+
+[Total Gross Revenue] = 
+CALCULATE(
+    SUM(Fact_Transactions[amount]),
+    Fact_Transactions[status] = "Completed"
+)
+
+[Total Refunded Amount] = 
+CALCULATE(
+    SUM(Fact_Transactions[amount]),
+    Fact_Transactions[status] = "Refunded"
+)
+
+[Net Revenue] = 
+[Total Gross Revenue] - [Total Refunded Amount]
+
+[Refund Rate %] = 
+DIVIDE([Total Refunded Amount], [Total Gross Revenue], 0)
+
+[Average Order Value (AOV)] = 
+DIVIDE(
+    [Total Gross Revenue],
+    CALCULATE(COUNTROWS(Fact_Transactions), Fact_Transactions[status] = "Completed"),
+    0
+)
+
+[Active Paying Customers] = 
+CALCULATE(
+    DISTINCTCOUNT(Fact_Transactions[customer_id]),
+    Fact_Transactions[status] = "Completed"
+)
+
+[Average Revenue Per User (ARPU)] = 
+DIVIDE([Net Revenue], [Active Paying Customers], 0)
+
+[Monthly Recurring Revenue (MRR)] = 
+CALCULATE(
+    [Net Revenue],
+    Fact_Transactions[category] = "Subscription"
+)
+
+[Previous Month Revenue] = 
+CALCULATE(
+    [Net Revenue],
+    DATEADD(Dim_Date[full_date], -1, MONTH)
+)
+
+[MoM Revenue Growth %] = 
+VAR PrevRev = [Previous Month Revenue]
+RETURN
+DIVIDE([Net Revenue] - PrevRev, PrevRev, 0)
+
+// ----------------------------------------------------------------------------
+// 2. RETENTION & COHORT ANALYSIS MEASURES
+// ----------------------------------------------------------------------------
+
+[Total Customer Count] = 
+DISTINCTCOUNT(Dim_Customer[customer_id])
+
+[Active Customer Count] = 
+CALCULATE(
+    DISTINCTCOUNT(Dim_Customer[customer_id]),
+    Dim_Customer[churn_status] = 0
+)
+
+[Churned Customer Count] = 
+CALCULATE(
+    DISTINCTCOUNT(Dim_Customer[customer_id]),
+    Dim_Customer[churn_status] = 1
+)
+
+[Customer Churn Rate %] = 
+DIVIDE([Churned Customer Count], [Total Customer Count], 0)
+
+[Customer Retention Rate %] = 
+1 - [Customer Churn Rate %]
+
+[Average Customer Age] = 
+AVERAGE(Dim_Customer[age])
+
+// ----------------------------------------------------------------------------
+// 3. CHURN PREDICTION & RISK INTELLIGENCE MEASURES
+// ----------------------------------------------------------------------------
+
+[Average Churn Probability] = 
+AVERAGE(Dim_ChurnPredictions[churn_probability])
+
+[Critical Risk Customers] = 
+CALCULATE(
+    COUNTROWS(Dim_ChurnPredictions),
+    Dim_ChurnPredictions[risk_tier] = "Critical Risk"
+)
+
+[High Risk Customers] = 
+CALCULATE(
+    COUNTROWS(Dim_ChurnPredictions),
+    Dim_ChurnPredictions[risk_tier] = "High Risk"
+)
+
+[Total At-Risk Customers] = 
+[Critical Risk Customers] + [High Risk Customers]
+
+[Revenue at Immediate Risk] = 
+CALCULATE(
+    [Net Revenue],
+    Dim_ChurnPredictions[risk_tier] IN {"Critical Risk", "High Risk"}
+)
+
+[Predicted Churn Count] = 
+CALCULATE(
+    COUNTROWS(Dim_ChurnPredictions),
+    Dim_ChurnPredictions[predicted_churn] = 1
+)
+
+// ----------------------------------------------------------------------------
+// 4. CUSTOMER LIFETIME VALUE (CLV) & PARETO MEASURES
+// ----------------------------------------------------------------------------
+
+[Total Historical Spend] = 
+SUM(Dim_CLVPredictions[historical_revenue])
+
+[Total Projected 12M CLV] = 
+SUM(Dim_CLVPredictions[predicted_clv_12m])
+
+[Average Predicted CLV] = 
+AVERAGE(Dim_CLVPredictions[predicted_clv_12m])
+
+[Median Predicted CLV] = 
+MEDIAN(Dim_CLVPredictions[predicted_clv_12m])
+
+[Platinum Tier Customers] = 
+CALCULATE(
+    COUNTROWS(Dim_CLVPredictions),
+    Dim_CLVPredictions[clv_tier] = "Platinum Tier (Top 10%)"
+)
+
+[Platinum Tier Revenue Share %] = 
+VAR PlatinumRev = CALCULATE([Total Projected 12M CLV], Dim_CLVPredictions[clv_tier] = "Platinum Tier (Top 10%)")
+RETURN
+DIVIDE(PlatinumRev, [Total Projected 12M CLV], 0)
+
+[Cumulative CLV All Customers] = 
+CALCULATE(
+    [Total Projected 12M CLV],
+    ALLSELECTED(Dim_Customer)
+)
+
+// ----------------------------------------------------------------------------
+// 5. RETENTION OPTIMIZATION & ROI SIMULATOR MEASURES (SIMULATED SCENARIO MODELING)
+// Note: All retention financial outcomes represent simulated what-if modeling
+// based on target intervention unit costs and empirical acceptance rates.
+// ----------------------------------------------------------------------------
+
+[Simulated Total Campaign Cost] = 
+SUM(Dim_RetentionRecommendations[estimated_retention_cost])
+
+[Simulated Total Saved Revenue] = 
+SUM(Dim_RetentionRecommendations[expected_saved_revenue])
+
+[Simulated Net Retention Benefit $] = 
+[Simulated Total Saved Revenue] - [Simulated Total Campaign Cost]
+
+[Simulated Retention ROI Multiplier %] = 
+DIVIDE([Simulated Net Retention Benefit $], [Simulated Total Campaign Cost], 0)
+
+[Simulated Average Cost Per Retained Customer] = 
+DIVIDE(
+    [Simulated Total Campaign Cost],
+    CALCULATE(
+        COUNTROWS(Dim_RetentionRecommendations),
+        Dim_RetentionRecommendations[expected_saved_revenue] > 0
+    ),
+    0
+)
+
+[Simulated Campaign Payback Period (Months)] = 
+VAR MonthlySaved = DIVIDE([Simulated Total Saved Revenue], 12, 0)
+RETURN
+DIVIDE([Simulated Total Campaign Cost], MonthlySaved, 0)
