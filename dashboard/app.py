@@ -20,7 +20,7 @@ import plotly.graph_objects as go
 
 from src.database.connection import db_manager
 from src.database.sql_runner import SQLAnalyticsRunner
-from src.config import MODELS_DIR, DATA_DIR, POWER_BI_DIR, is_database_available
+from src.config import MODELS_DIR, DATA_DIR, PROCESSED_DATA_DIR, POWER_BI_DIR, is_database_available
 
 st.set_page_config(
     page_title="Customer Intelligence & Retention Engine",
@@ -35,47 +35,46 @@ if css_path.exists():
     with open(css_path, "r", encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Sidebar
+# Helper for robust multi-page links
+def render_page_navigation_link(page_filename: str, label: str, icon: str = None):
+    """Renders a robust page link compatible with both root and directory execution."""
+    paths_to_try = [
+        f"dashboard/pages/{page_filename}",
+        f"pages/{page_filename}"
+    ]
+    for p in paths_to_try:
+        try:
+            st.page_link(p, label=label, icon=icon)
+            return
+        except Exception:
+            continue
+    st.markdown(f"👉 **{label}** *(Access from left sidebar)*")
+
+# Sidebar Branding & Guidance
 st.sidebar.image("https://img.icons8.com/fluency/96/bullseye.png", width=64)
 st.sidebar.title("Customer Intelligence")
 st.sidebar.caption("⚡ Churn, LTV & Retention Optimization Engine")
 st.sidebar.markdown("---")
 
-st.sidebar.markdown("### 🧭 Platform Modules")
-st.sidebar.markdown("""
-- [📊 1. Executive Overview](Executive_Overview)
-- [🧩 2. Customer Segmentation](Customer_Segmentation_RFM)
-- [⚡ 3. Churn Prediction](Churn_Prediction)
-- [🔍 4. SHAP Explainability](SHAP_Customer_Explainability)
-- [💎 5. Customer Lifetime Value](Customer_Lifetime_Value)
-- [💡 6. Retention Strategy & ROI](Retention_Strategy_ROI)
-- [⚙️ 7. Data Eng & MLOps](Data_Engineering_MLOps)
+st.sidebar.info("""
+**🧭 Navigation Guide**:
+All **7 interactive modules** (with live graphs, 3D scatter plots, ROC curves, and SHAP waterfalls) are accessible from the **menu above**.
 """)
 
-st.sidebar.markdown("---")
 st.sidebar.warning("""
 **⚠️ Demonstration Notice**:
 This application uses synthetic demonstration data. Financial outcomes and retention ROI are simulated and should not be interpreted as real company performance.
 """)
 
-st.sidebar.info("""
-**Tech Stack**:
-- Python, PostgreSQL & SQLite
-- Scikit-learn, XGBoost, SHAP
-- Apache Airflow, MLflow
-- Streamlit & Power BI
-""")
-
 st.sidebar.markdown("---")
-st.sidebar.caption("Portfolio Project | [GitHub Repository](https://github.com/)")
+st.sidebar.caption("Portfolio Project | [GitHub Repository](https://github.com/Shashankj45/customer-retention-intelligence-engine)")
 
-# Main Title & Notice Banner
+# Main Header & Prominent Visualization Banner
 st.title("⚡ Customer Intelligence, Churn, LTV & Retention Optimization Engine")
-st.warning("⚠️ **PUBLIC DEMO & SIMULATION NOTICE**: This application uses synthetic demonstration data. Financial outcomes and retention ROI are simulated and should not be interpreted as real company performance. All customer records and telemetries are generated synthetically for benchmark modeling.")
 
-st.markdown("""
-An industry-grade, end-to-end data science and decision intelligence platform that unifies **Data Engineering, Advanced SQL Analytics, Explainable Machine Learning (XGBoost & SHAP), Customer Lifetime Value (CLV), and Financial Retention Optimization** into a unified executive decision system.
-""")
+st.info("💡 **NO DOWNLOAD REQUIRED TO VIEW CHARTS!** All interactive graphs, ML predictions, and retention simulators are **rendered live directly in this web application**. You do NOT need to download anything. Explore the live interactive preview charts below, or use the **left sidebar** (or buttons below) to jump into any module!")
+
+st.warning("⚠️ **PUBLIC DEMO & SIMULATION NOTICE**: This application uses synthetic demonstration data. Financial outcomes and retention ROI are simulated and should not be interpreted as real company performance. All customer records and telemetries are generated synthetically for benchmark modeling.")
 
 st.markdown("---")
 
@@ -108,61 +107,139 @@ with col4:
 
 st.markdown("---")
 
+# -----------------------------------------------------------------------------
+# LIVE INTERACTIVE EXECUTIVE CHARTS (RENDERED DIRECTLY ON THE LANDING PAGE!)
+# -----------------------------------------------------------------------------
+st.subheader("📈 Live Executive Visualizations (Interactive Web Charts)")
+st.caption("Hover, zoom, pan, and inspect data points directly in your browser without downloading any files.")
+
+@st.cache_data(ttl=3600)
+def load_preview_charts_data():
+    runner = SQLAnalyticsRunner()
+    rev_data = runner.get_revenue_trends()
+    
+    scored_file = PROCESSED_DATA_DIR / "churn_scored_customers.parquet"
+    if scored_file.exists():
+        churn_df = pd.read_parquet(scored_file)
+        risk_counts = churn_df["risk_tier"].value_counts().reset_index()
+        risk_counts.columns = ["risk_tier", "count"]
+    else:
+        risk_counts = pd.DataFrame([
+            {"risk_tier": "Low Risk", "count": 2282},
+            {"risk_tier": "Critical Risk", "count": 1423},
+            {"risk_tier": "Medium Risk", "count": 779},
+            {"risk_tier": "High Risk", "count": 516}
+        ])
+        
+    return rev_data, risk_counts
+
+rev_df_preview, risk_counts_preview = load_preview_charts_data()
+
+chart_c1, chart_c2 = st.columns([3, 2])
+
+with chart_c1:
+    fig_rev = go.Figure()
+    fig_rev.add_trace(go.Bar(
+        x=rev_df_preview["revenue_month"],
+        y=rev_df_preview["net_revenue"],
+        name="Net Revenue ($)",
+        marker_color="#3B82F6",
+        yaxis="y1"
+    ))
+    fig_rev.add_trace(go.Scatter(
+        x=rev_df_preview["revenue_month"],
+        y=rev_df_preview["mom_growth_pct"],
+        name="MoM Growth Rate (%)",
+        mode="lines+markers",
+        marker=dict(color="#10B981", size=6),
+        line=dict(color="#10B981", width=2),
+        yaxis="y2"
+    ))
+    fig_rev.update_layout(
+        template="plotly_dark",
+        title="Monthly Net Revenue Performance & Growth Velocity",
+        yaxis=dict(title="Net Revenue ($)", showgrid=False),
+        yaxis2=dict(title="MoM Growth (%)", overlaying="y", side="right", showgrid=False),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        height=380,
+        margin=dict(l=20, r=20, t=50, b=20)
+    )
+    st.plotly_chart(fig_rev, use_container_width=True)
+
+with chart_c2:
+    fig_donut = px.pie(
+        risk_counts_preview,
+        names="risk_tier",
+        values="count",
+        hole=0.45,
+        title="Customer Base Churn Risk Distribution",
+        color="risk_tier",
+        color_discrete_map={
+            "Low Risk": "#10B981",
+            "Medium Risk": "#F59E0B",
+            "High Risk": "#F97316",
+            "Critical Risk": "#EF4444"
+        }
+    )
+    fig_donut.update_layout(template="plotly_dark", height=380, margin=dict(l=20, r=20, t=50, b=20))
+    st.plotly_chart(fig_donut, use_container_width=True)
+
+st.markdown("---")
+
 # Main Content Tabs
 tab_overview, tab_architecture, tab_dataset, tab_ml_analytics, tab_findings, tab_powerbi = st.tabs([
-    "🎯 Business Context & Navigation",
+    "🎯 All 7 Modules & Direct Links",
     "🏗️ Architecture & Tech Stack",
     "📦 Dataset & Engineering",
     "🤖 ML & Predictive Capabilities",
     "📈 Empirical Insights & Limits",
-    "📊 Power BI Data Assets"
+    "📊 Power BI Desktop Assets (Optional Downloads)"
 ])
 
 # TAB 1: Business Context & Module Navigation
 with tab_overview:
-    st.subheader("💼 Business Problem & Strategic Objectives")
+    st.subheader("🧭 Access All 7 Interactive Visualization Modules")
     st.markdown("""
-    Modern subscription and recurring transactional businesses face sharply rising Customer Acquisition Costs (CAC), making retention and expansion revenue the primary drivers of enterprise value. 
-    
-    This platform addresses three core commercial imperatives:
-    1. **Early Risk Identification**: Detect disengaging accounts 30–60 days before contract cancellation using behavioral event telemetry.
-    2. **Value-Preservation Prioritization**: Concentrate executive interventions and marketing spend on high-equity accounts rather than treating all churn risks equally.
-    3. **Prescriptive Action & ROI Simulation**: Recommend personalized, cost-calibrated retention interventions and stress-test campaign payback before committing marketing capital.
+    Click any button below (or use the sidebar on the left) to navigate to the deep-dive module pages. **Every page contains live, interactive visualizations:**
     """)
-    
-    st.markdown("### 🧭 Interactive Dashboard Navigation")
-    st.markdown("Select any module from the left sidebar or explore the key capabilities below:")
 
     nav_c1, nav_c2 = st.columns(2)
     with nav_c1:
         with st.container(border=True):
-            st.markdown("#### [📊 1. Executive Overview](Executive_Overview)")
-            st.markdown("Macro financial health, Monthly Recurring Revenue (MRR), Monthly Cohort Survival heatmaps, and acquisition channel ROI.")
-        
-        with st.container(border=True):
-            st.markdown("#### [🧩 2. Customer Segmentation & RFM](Customer_Segmentation_RFM)")
-            st.markdown("Recency, Frequency, Monetary (RFM) quintile clustering, Champions vs. At-Risk groups, and 3D behavioral scatter distribution.")
-        
-        with st.container(border=True):
-            st.markdown("#### [⚡ 3. Churn Prediction](Churn_Prediction)")
-            st.markdown("XGBoost Champion model evaluation (0.9092 ROC-AUC, 0.7955 F1), 4-tier risk classification, and actionable high-risk customer watchlist.")
+            st.markdown("#### 📊 1. Executive Overview")
+            st.markdown("Macro financial health, Monthly Recurring Revenue (MRR), **Monthly Cohort Survival Heatmap**, and acquisition channel ROI.")
+            render_page_navigation_link("1_Executive_Overview.py", "Open Executive Overview (Live Charts)", "📊")
 
         with st.container(border=True):
-            st.markdown("#### [🔍 4. SHAP Customer Explainability](SHAP_Customer_Explainability)")
-            st.markdown("Transparent TreeSHAP waterfall diagnostics decomposing individual customer risk boosters and protective buffers.")
+            st.markdown("#### 🧩 2. Customer Segmentation & RFM")
+            st.markdown("Recency, Frequency, Monetary (RFM) quintiles, Champions vs. At-Risk groups, and **Interactive 3D Behavioral Scatter Plot**.")
+            render_page_navigation_link("2_Customer_Segmentation_RFM.py", "Open Customer Segmentation (3D Plot)", "🧩")
+
+        with st.container(border=True):
+            st.markdown("#### ⚡ 3. Churn Prediction")
+            st.markdown("XGBoost Champion model evaluation (0.9092 ROC-AUC), **ROC & Precision-Recall curves**, probability histogram, and high-risk customer watchlist.")
+            render_page_navigation_link("3_Churn_Prediction.py", "Open Churn Prediction (ROC Curves & Watchlist)", "⚡")
+
+        with st.container(border=True):
+            st.markdown("#### 🔍 4. SHAP Customer Explainability")
+            st.markdown("Transparent **TreeSHAP Waterfall Plots** decomposing individual customer risk boosters (red) and protective buffers (green).")
+            render_page_navigation_link("4_SHAP_Customer_Explainability.py", "Open SHAP Explainability (Waterfall Plots)", "🔍")
 
     with nav_c2:
         with st.container(border=True):
-            st.markdown("#### [💎 5. Customer Lifetime Value (CLV)](Customer_Lifetime_Value)")
-            st.markdown("Forward 12-month value regression ($R^2 = 0.7276$), Pareto 80/20 revenue concentration curve, and Platinum-to-Bronze equity tiers.")
+            st.markdown("#### 💎 5. Customer Lifetime Value (CLV)")
+            st.markdown("Forward 12-month value regression ($R^2 = 0.7276$), **Pareto 80/20 Revenue Concentration Curve**, and Platinum-to-Bronze equity tiers.")
+            render_page_navigation_link("5_Customer_Lifetime_Value.py", "Open Customer Lifetime Value (Pareto Curve)", "💎")
 
         with st.container(border=True):
-            st.markdown("#### [💡 6. Retention Strategy & ROI Simulator](Retention_Strategy_ROI)")
-            st.markdown("Interactive what-if scenario modeling: adjust outreach costs, discount incentives, and acceptance elasticities in real-time.")
+            st.markdown("#### 💡 6. Retention Strategy & ROI Simulator")
+            st.markdown("**Interactive What-If Scenario Simulator**: Adjust outreach costs, discount incentives, and acceptance elasticities with real-time financial waterfall updates.")
+            render_page_navigation_link("6_Retention_Strategy_ROI.py", "Open Retention ROI Simulator (Interactive Sliders)", "💡")
 
         with st.container(border=True):
-            st.markdown("#### [⚙️ 7. Data Engineering & MLOps](Data_Engineering_MLOps)")
-            st.markdown("Automated ETL execution telemetry, 32 automated Data Quality test results, and statistical drift monitoring (PSI & KS tests).")
+            st.markdown("#### ⚙️ 7. Data Engineering & MLOps")
+            st.markdown("Automated ETL execution telemetry, **32 Automated Data Quality Test Results**, and feature drift stability monitoring (PSI & KS tests).")
+            render_page_navigation_link("7_Data_Engineering_MLOps.py", "Open Data Engineering & MLOps", "⚙️")
 
 # TAB 2: Architecture & Tech Stack
 with tab_architecture:
@@ -294,13 +371,17 @@ with tab_findings:
     * **Attribution Transparency**: All financial ROI metrics presented in this application represent simulated scenarios for portfolio benchmarking and must not be interpreted as audited historical revenue.
     """)
 
-# TAB 6: Power BI Data Assets
+# TAB 6: Power BI Data Assets (Optional Downloads)
 with tab_powerbi:
-    st.subheader("📊 Power BI Integration & Downloadable Mart")
-    st.markdown("""
-    The platform pre-packages a complete Star Schema dimensional mart and 30+ production DAX formulas for Microsoft Power BI Desktop.
+    st.subheader("📊 Power BI Desktop Assets (Optional Downloads)")
     
-    > **Note**: Microsoft Power BI Desktop reports (.pbix) run locally in Power BI Desktop or in the cloud Power BI Service; they open separately from this web application.
+    st.success("""
+    ✅ **NO DOWNLOAD REQUIRED TO VIEW CHARTS!**  
+    All interactive visualizations, predictive models, and retention simulators are **already rendered live online in this web app**. You can explore every chart directly in your browser by clicking the module names in the **left sidebar**.
+    """)
+    
+    st.markdown("""
+    The CSV files below are **completely optional downloads** provided only for business intelligence analysts who want the raw Star Schema dimensional tables to build custom reports inside **Microsoft Power BI Desktop**.
     """)
 
     pbi_files = [
@@ -313,7 +394,7 @@ with tab_powerbi:
         ("Fact_Transactions.csv", "Granular financial transactions ledger (51,653 rows)")
     ]
 
-    st.markdown("#### 📥 Download Pre-Packaged Analytical Mart Tables (CSV)")
+    st.markdown("#### 📥 Optional: Download Raw Star Schema Tables for Power BI Desktop")
     pbi_cols = st.columns(2)
     for idx, (fname, fdesc) in enumerate(pbi_files):
         fpath = POWER_BI_DIR / fname
@@ -334,4 +415,4 @@ with tab_powerbi:
                 st.caption(f"ℹ️ {fname} available after export pipeline step.")
 
     st.markdown("---")
-    st.info("📋 **DAX Formulas & Schema Reference**: To import these tables and apply DAX measures, refer to [`power_bi/README.md`](https://github.com/) and [`power_bi/dax_measures.txt`](https://github.com/).")
+    st.info("📋 **DAX Formulas & Schema Reference**: To import these tables and apply DAX measures in Power BI Desktop, refer to [`power_bi/README.md`](https://github.com/Shashankj45/customer-retention-intelligence-engine/blob/main/power_bi/README.md) and [`power_bi/dax_measures.txt`](https://github.com/Shashankj45/customer-retention-intelligence-engine/blob/main/power_bi/dax_measures.txt).")
