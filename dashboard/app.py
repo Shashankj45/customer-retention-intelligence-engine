@@ -51,9 +51,8 @@ def render_page_navigation_link(page_filename: str, label: str, icon: str = None
     st.markdown(f"👉 **{label}** *(Access from left sidebar)*")
 
 # Sidebar Branding & Guidance
-st.sidebar.image("https://img.icons8.com/fluency/96/bullseye.png", width=64)
-st.sidebar.title("Customer Intelligence")
-st.sidebar.caption("⚡ Churn, LTV & Retention Optimization Engine")
+st.sidebar.markdown("## ⚡ Customer Intelligence")
+st.sidebar.caption("Churn, LTV & Retention Optimization Engine")
 st.sidebar.markdown("---")
 
 st.sidebar.info("""

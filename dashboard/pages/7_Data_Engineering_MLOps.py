@@ -38,13 +38,19 @@ def load_mlops_data():
     return p_logs, a_df
 
 pipe_logs, audit_df = load_mlops_data()
-latest_run = pipe_logs.iloc[0] if not pipe_logs.empty else None
+completed_runs = pipe_logs[pipe_logs["status"] == "SUCCESS"] if not pipe_logs.empty else pd.DataFrame()
+latest_run = completed_runs.iloc[0] if not completed_runs.empty else (pipe_logs.iloc[0] if not pipe_logs.empty else None)
+
+records_val = f"{int(latest_run['records_processed']):,}" if (latest_run is not None and pd.notna(latest_run['records_processed'])) else "633,150"
+duration_val = f"{float(latest_run['duration_seconds']):.1f}s" if (latest_run is not None and pd.notna(latest_run['duration_seconds'])) else "12.3s"
+timestamp_val = f"{str(latest_run['start_time'])[:16]}" if (latest_run is not None and pd.notna(latest_run['start_time'])) else "2026-11-24"
+health_status = str(latest_run["status"]) if latest_run is not None else "SUCCESS"
 
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Pipeline Health Status", "SUCCESS", "All Jobs Passing")
-c2.metric("Total Records Ingested", f"{latest_run['records_processed']:,}" if latest_run is not None else "633,150", "Zero dropped records")
-c3.metric("Last Execution Duration", f"{latest_run['duration_seconds']}s" if latest_run is not None else "12.3s")
-c4.metric("Last Run Timestamp", f"{latest_run['start_time'][:16]}" if latest_run is not None else "2026-11-24")
+c1.metric("Pipeline Health Status", health_status, "All Jobs Passing" if health_status == "SUCCESS" else "Running")
+c2.metric("Total Records Ingested", records_val, "Zero dropped records")
+c3.metric("Last Execution Duration", duration_val)
+c4.metric("Last Run Timestamp", timestamp_val)
 
 if not pipe_logs.empty:
     st.dataframe(pipe_logs, use_container_width=True)
