@@ -153,7 +153,7 @@ st.dataframe(
 st.caption("Displaying top 250 highest-ROI retention opportunities.")
 
 with st.expander("ℹ️ Simulation Assumptions, Mathematical Framework & Sensitivity Limits"):
-    st.markdown("""
+    st.markdown(r"""
     ### 🔬 Methodology & Economic Assumptions
     
     1. **Counterfactual Baseline**:

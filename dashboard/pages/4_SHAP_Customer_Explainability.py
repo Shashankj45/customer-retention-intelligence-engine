@@ -70,6 +70,10 @@ def get_cached_customer_explanation(customer_id: str):
 merged_sorted = merged.sort_values(by="churn_probability", ascending=False)
 customer_options = [f"{row['customer_id']} - {row['customer_name']} (Churn Prob: {row['churn_probability']:.1%})" for _, row in merged_sorted.iterrows()]
 
+if not customer_options:
+    st.info("No scored customer records found to diagnose.")
+    st.stop()
+
 col_s1, col_s2 = st.columns([2, 1])
 with col_s1:
     selected_option = st.selectbox("Select Customer to Diagnose:", options=customer_options, index=0)

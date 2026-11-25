@@ -27,15 +27,15 @@ rfm_df = load_rfm_data()
 # 1. Summary Metrics
 total_cust = len(rfm_df)
 champions = len(rfm_df[rfm_df["rfm_segment"] == "Champions"])
+loyal = len(rfm_df[rfm_df["rfm_segment"] == "Loyal Customers"])
 at_risk = len(rfm_df[rfm_df["rfm_segment"] == "At Risk"])
-cant_lose = len(rfm_df[rfm_df["rfm_segment"] == "Can't Lose Them"])
 hibernating = len(rfm_df[rfm_df["rfm_segment"] == "Hibernating"])
 
 c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Total Customers Evaluated", f"{total_cust:,}")
 c2.metric("🏆 Champions", f"{champions:,}", f"{(champions/total_cust)*100:.1f}%")
-c3.metric("⚠️ At Risk", f"{at_risk:,}", f"{(at_risk/total_cust)*100:.1f}%", delta_color="inverse")
-c4.metric("🚨 Can't Lose Them", f"{cant_lose:,}", f"{(cant_lose/total_cust)*100:.1f}%", delta_color="inverse")
+c3.metric("💎 Loyal Customers", f"{loyal:,}", f"{(loyal/total_cust)*100:.1f}%")
+c4.metric("⚠️ At Risk", f"{at_risk:,}", f"{(at_risk/total_cust)*100:.1f}%", delta_color="inverse")
 c5.metric("💤 Hibernating", f"{hibernating:,}", f"{(hibernating/total_cust)*100:.1f}%")
 
 st.markdown("---")
@@ -120,10 +120,16 @@ st.subheader("📋 Segment Customer Search & Export")
 
 col_f1, col_f2 = st.columns([2, 1])
 with col_f1:
+    available_segments = sorted(list(rfm_df["rfm_segment"].dropna().unique()))
+    preferred_defaults = ["Champions", "Loyal Customers", "At Risk"]
+    safe_defaults = [s for s in preferred_defaults if s in available_segments]
+    if not safe_defaults and available_segments:
+        safe_defaults = available_segments[:2]
+
     selected_segments = st.multiselect(
         "Filter by RFM Segment:",
-        options=list(rfm_df["rfm_segment"].unique()),
-        default=["Champions", "At Risk", "Can't Lose Them"]
+        options=available_segments,
+        default=safe_defaults
     )
 with col_f2:
     search_query = st.text_input("Search Customer Name or ID:", "")
