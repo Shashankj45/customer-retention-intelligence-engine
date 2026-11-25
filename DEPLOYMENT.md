@@ -2,7 +2,7 @@
 
 ## Customer Intelligence, Churn, LTV & Retention Optimization Engine
 
-This guide provides end-to-end, step-by-step instructions to deploy this project publicly on **GitHub** and **Streamlit Community Cloud**, generating a public HTTPS URL (e.g., `https://customer-intelligence-engine.streamlit.app`) suitable for resumes, LinkedIn profiles, and job applications.
+This guide provides end-to-end, step-by-step instructions to deploy this project publicly on **GitHub** and **Streamlit Community Cloud**, generating a public HTTPS URL (e.g., `https://customer-retention-intelligence-engine-8rxl25roozqfarvt3vxcch.streamlit.app/`) suitable for resumes, LinkedIn profiles, and job applications.
 
 ---
 
@@ -91,8 +91,8 @@ Copy the commands shown on your new GitHub repo page:
 # Rename branch to main
 git branch -M main
 
-# Add remote origin (replace YOUR-USERNAME with your actual GitHub username)
-git remote add origin https://github.com/YOUR-USERNAME/customer-retention-intelligence-engine.git
+# Add remote origin
+git remote add origin https://github.com/Shashankj45/customer-retention-intelligence-engine.git
 
 # Push to GitHub
 git push -u origin main
@@ -109,11 +109,11 @@ git push -u origin main
 
 ### Step 5.2: Configure Deployment Settings
 Fill out the deployment dialog:
-* **Repository**: `YOUR-USERNAME/customer-retention-intelligence-engine`
+* **Repository**: `Shashankj45/customer-retention-intelligence-engine`
 * **Branch**: `main`
 * **Main file path**: `streamlit_app.py` *(or `dashboard/app.py`)*
 * **App URL (optional customization)**: Click the dropdown to customize your public subdomain:
-  e.g., `https://customer-intelligence-engine.streamlit.app`
+  e.g., `https://customer-retention-intelligence-engine-8rxl25roozqfarvt3vxcch.streamlit.app/`
 
 ### Step 5.3: Deploy the Application
 1. Click **"Deploy!"**.
@@ -191,8 +191,8 @@ Add this link to your resume and professional profiles:
 ```text
 Projects:
 Customer Intelligence, Churn, LTV & Retention Optimization Engine
-• Live Demo: https://customer-intelligence-engine.streamlit.app
-• Code: https://github.com/YOUR-USERNAME/customer-retention-intelligence-engine
+• Live Demo: https://customer-retention-intelligence-engine-8rxl25roozqfarvt3vxcch.streamlit.app/
+• Code: https://github.com/Shashankj45/customer-retention-intelligence-engine
 • Built an end-to-end data science and retention optimization platform predicting customer churn (XGBoost, 0.9092 ROC-AUC) and 12-month CLV (Gradient Boosting, R²=0.73) with TreeSHAP waterfall explainability.
 • Implemented automated ETL with 32 data quality validation checks in PostgreSQL/SQLite and an interactive what-if financial ROI retention simulator in Streamlit.
 ```

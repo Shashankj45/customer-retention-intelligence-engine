@@ -1,6 +1,6 @@
 # ⚡ Customer Intelligence, Churn, LTV & Retention Optimization Engine
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://customer-intelligence-engine.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://customer-retention-intelligence-engine-8rxl25roozqfarvt3vxcch.streamlit.app/)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![Database](https://img.shields.io/badge/database-PostgreSQL%20%7C%20SQLite-336791.svg)](https://www.postgresql.org/)
 [![Machine Learning](https://img.shields.io/badge/ML-Scikit--learn%20%7C%20XGBoost%20%7C%20SHAP-orange.svg)](https://xgboost.readthedocs.io/)
@@ -12,7 +12,7 @@
 
 An enterprise-grade, end-to-end data science, data engineering, and retention optimization platform. This project ingests multi-source customer telemetry, executes automated ETL with data quality testing, performs advanced SQL analytics (RFM and cohort retention), trains champion XGBoost churn models with SHAP explainability, forecasts Customer Lifetime Value (CLV) with Pareto 80/20 analysis, and simulates marketing campaign ROI.
 
-> **🌐 Live Cloud Demo**: [`https://customer-intelligence-engine.streamlit.app`](https://customer-intelligence-engine.streamlit.app)  
+> **🌐 Live Cloud Demo**: [`https://customer-retention-intelligence-engine-8rxl25roozqfarvt3vxcch.streamlit.app/`](https://customer-retention-intelligence-engine-8rxl25roozqfarvt3vxcch.streamlit.app/)  
 > **📖 Step-by-Step Deployment Guide**: See [`DEPLOYMENT.md`](DEPLOYMENT.md) for GitHub and Streamlit Community Cloud setup instructions.  
 > **Zero Generative AI or Paid APIs**: Built entirely with free, open-source data science, engineering, and machine learning technologies.
 >
