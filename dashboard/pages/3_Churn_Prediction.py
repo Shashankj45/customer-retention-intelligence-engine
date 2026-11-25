@@ -48,8 +48,14 @@ def load_churn_data():
 
 metadata, metrics_dict, merged_scored = load_churn_data()
 
+# Guard: ensure risk_tier column exists before accessing it
+if "risk_tier" not in merged_scored.columns:
+    merged_scored["risk_tier"] = "Low Risk"
+if "churn_probability" not in merged_scored.columns:
+    merged_scored["churn_probability"] = 0.0
+
 # Top KPI Cards
-total_scored = len(merged_scored)
+total_scored = max(len(merged_scored), 1)  # prevent division by zero
 critical_cnt = len(merged_scored[merged_scored["risk_tier"] == "Critical Risk"])
 high_cnt = len(merged_scored[merged_scored["risk_tier"] == "High Risk"])
 medium_cnt = len(merged_scored[merged_scored["risk_tier"] == "Medium Risk"])
@@ -98,7 +104,7 @@ if metrics_dict:
         title="Model Metric Comparisons Across Key Performance Indicators",
         labels={"value": "Score", "variable": "Metric"}
     )
-    fig_comp.update_layout(template="plotly_dark", height=380, yaxis_range=[0.8, 1.02])
+    fig_comp.update_layout(template="plotly_dark", height=380, yaxis_range=[0.6, 1.02])
     st.plotly_chart(fig_comp, use_container_width=True)
 
 st.markdown("---")
@@ -163,15 +169,16 @@ filtered_watch = merged_scored[
 ]
 
 if name_filter:
-    filtered_watch = filtered_watch[
-        filtered_watch["customer_name"].str.contains(name_filter, case=False, na=False) |
-        filtered_watch["customer_id"].str.contains(name_filter, case=False, na=False)
-    ]
+    mask = filtered_watch["customer_id"].astype(str).str.contains(name_filter, case=False, na=False)
+    if "customer_name" in filtered_watch.columns:
+        mask = mask | filtered_watch["customer_name"].astype(str).str.contains(name_filter, case=False, na=False)
+    filtered_watch = filtered_watch[mask]
 
+watchlist_cols = ["customer_id", "customer_name", "churn_probability", "risk_tier",
+                  "subscription_tier", "contract_type", "top_feature_1", "top_feature_2", "top_feature_3"]
+safe_cols = [c for c in watchlist_cols if c in filtered_watch.columns]
 st.dataframe(
-    filtered_watch.sort_values(by="churn_probability", ascending=False)[
-        ["customer_id", "customer_name", "churn_probability", "risk_tier", "subscription_tier", "contract_type", "top_feature_1", "top_feature_2", "top_feature_3"]
-    ],
+    filtered_watch.sort_values(by="churn_probability", ascending=False)[safe_cols],
     use_container_width=True,
     height=400
 )

@@ -117,7 +117,8 @@ with col_d2:
         fig_psi.update_layout(template="plotly_dark", height=320, margin=dict(l=20, r=20, t=20, b=20))
         st.plotly_chart(fig_psi, use_container_width=True)
 
-st.dataframe(feat_drift_df, use_container_width=True)
+if not feat_drift_df.empty:
+    st.dataframe(feat_drift_df, use_container_width=True)
 
 st.markdown("---")
 

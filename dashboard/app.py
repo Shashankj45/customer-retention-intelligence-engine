@@ -321,18 +321,18 @@ with tab_dataset:
         - **Support Tickets (`support_tickets`)**: 3,691 service interactions with resolution duration, issue category, urgency, and CSAT scores (1–5).
         """)
 
-    st.info("🛡️ **Data Quality Enforcement**: 32 automated integrity checks validate completeness (zero nulls in required fields), uniqueness (zero duplicate customer IDs or emails), referential foreign-key integrity, numeric boundaries, and chronological consistency ($signup \le transaction \le churn$).")
+    st.info(r"🛡️ **Data Quality Enforcement**: 32 automated integrity checks validate completeness (zero nulls in required fields), uniqueness (zero duplicate customer IDs or emails), referential foreign-key integrity, numeric boundaries, and chronological consistency ($signup \le transaction \le churn$).")
 
 # TAB 4: ML & Predictive Capabilities
 with tab_ml_analytics:
     st.subheader("🤖 Machine Learning & Explainability Benchmarks")
-    st.markdown("All models are trained strictly on behavioral rates normalized by active observation lifetime and evaluated on a genuinely unseen holdout test partition ($N=1,000$ accounts, baseline churn rate: $39.9\%$).")
+    st.markdown(r"All models are trained strictly on behavioral rates normalized by active observation lifetime and evaluated on a genuinely unseen holdout test partition ($N=1,000$ accounts, baseline churn rate: $39.9\%$).")
 
     perf_df = pd.DataFrame([
         {"Model Architecture": "Logistic Regression (Baseline)", "Accuracy": "77.6%", "Precision": "71.2%", "Recall": "73.7%", "F1-Score": "0.7241", "ROC-AUC": "0.8322"},
         {"Model Architecture": "Random Forest Classifier", "Accuracy": "78.1%", "Precision": "72.3%", "Recall": "73.2%", "F1-Score": "0.7273", "ROC-AUC": "0.8587"},
-        {"Model Architecture": "Gradient Boosting Classifier", "Accuracy": "84.4%", "Precision": "85.7%", "Recall": "73.4%", "F1-Score": "0.7908", "ROC-AUC": "0.9112"},
-        {"Model Architecture": "XGBoost Classifier (Champion)", "Accuracy": "79.8%", "Precision": "79.7%", "Recall": "79.5%", "F1-Score": "0.7955", "ROC-AUC": "0.9092"}
+        {"Model Architecture": "Gradient Boosting Classifier", "Accuracy": "84.5%", "Precision": "85.7%", "Recall": "73.4%", "F1-Score": "0.7908", "ROC-AUC": "0.9112"},
+        {"Model Architecture": "XGBoost Classifier (Champion)", "Accuracy": "83.7%", "Precision": "79.7%", "Recall": "79.5%", "F1-Score": "0.7955", "ROC-AUC": "0.9092"}
     ])
     st.dataframe(perf_df, use_container_width=True, hide_index=True)
 
@@ -365,7 +365,7 @@ with tab_findings:
 
     st.markdown("---")
     st.subheader("⚠️ Important Operational Limitations & Governance")
-    st.markdown("""
+    st.markdown(r"""
     * **Simulated Counterfactual Baseline**: In live corporate production, retention intervention success probabilities ($\eta$) should be calibrated via randomized controlled A/B testing holdout experiments.
     * **Cold-Start Accounts**: Customers with active tenures under 30 days have limited behavioral telemetry and are routed to onboarding checklists rather than pure ML scoring.
     * **Attribution Transparency**: All financial ROI metrics presented in this application represent simulated scenarios for portfolio benchmarking and must not be interpreted as audited historical revenue.

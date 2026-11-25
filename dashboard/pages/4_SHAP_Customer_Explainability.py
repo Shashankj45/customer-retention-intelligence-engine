@@ -141,8 +141,14 @@ if not combined_factors.empty:
 col_d1, col_d2 = st.columns(2)
 with col_d1:
     st.markdown("### ⚠️ Top 5 Risk Drivers (Why they might churn)")
-    st.dataframe(top_drivers[["feature", "shap_value", "feature_value"]], use_container_width=True)
+    if not top_drivers.empty:
+        st.dataframe(top_drivers[["feature", "shap_value", "feature_value"]], use_container_width=True)
+    else:
+        st.info("No positive risk-amplifying drivers detected for this customer.")
 
 with col_d2:
     st.markdown("### 🛡️ Top Protective Factors (Why they might stay)")
-    st.dataframe(top_protectors[["feature", "shap_value", "feature_value"]], use_container_width=True)
+    if not top_protectors.empty:
+        st.dataframe(top_protectors[["feature", "shap_value", "feature_value"]], use_container_width=True)
+    else:
+        st.info("No negative protective drivers detected for this customer.")
