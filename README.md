@@ -28,53 +28,53 @@ An enterprise-grade, end-to-end data science, data engineering, and retention op
 ```mermaid
 flowchart TD
     subgraph Data_Engineering["1. Data Engineering & Ingestion Layer"]
-        A1[Customer Demographics] --> B[Automated ETL Pipeline]
-        A2[Transactions Ledger] --> B
-        A3[Web Telemetry Sessions] --> B
-        A4[Support Ticket Inquiries] --> B
-        B --> C[Data Quality Validation Suite]
-        C --> D[(PostgreSQL / SQLite Database)]
-        C -.-> C1[data_quality_audit Table]
-        B -.-> B1[pipeline_execution_logs Table]
+        A1["Customer Demographics"] --> B["Automated ETL Pipeline"]
+        A2["Transactions Ledger"] --> B
+        A3["Web Telemetry Sessions"] --> B
+        A4["Support Ticket Inquiries"] --> B
+        B --> C["Data Quality Validation Suite"]
+        C --> D[("PostgreSQL / SQLite Database")]
+        C -.-> C1["data_quality_audit Table"]
+        B -.-> B1["pipeline_execution_logs Table"]
     end
 
     subgraph SQL_Analytics["2. Advanced SQL Analytics Layer"]
-        D --> E1[RFM Segmentation Engine]
-        D --> E2[Monthly Cohort Retention Matrix]
-        D --> E3[Revenue Velocity & MRR Trends]
-        D --> E4[Acquisition & Purchase Frequency]
+        D --> E1["RFM Segmentation Engine"]
+        D --> E2["Monthly Cohort Retention Matrix"]
+        D --> E3["Revenue Velocity & MRR Trends"]
+        D --> E4["Acquisition & Purchase Frequency"]
     end
 
     subgraph Machine_Learning["3. Machine Learning & Interpretability"]
-        D --> F[Feature Engineering Pipeline]
-        F --> G1[Model Benchmark Suite<br>Logistic Reg | RF | GBDT | XGBoost]
-        G1 --> G2[XGBoost Champion Model]
-        G2 --> G3[Cost-Benefit Threshold Optimizer]
-        G2 --> G4[SHAP TreeExplainer<br>Global & Individual Force Decomposition]
-        F --> H1[CLV Regression Model<br>Gradient Boosting Regressor]
-        H1 --> H2[Pareto 80/20 Concentration Engine]
+        D --> F["Feature Engineering Pipeline"]
+        F --> G1["Model Benchmark Suite: Logistic Reg, RF, GBDT, XGBoost"]
+        G1 --> G2["XGBoost Champion Model"]
+        G2 --> G3["Cost-Benefit Threshold Optimizer"]
+        G2 --> G4["SHAP TreeExplainer: Global & Individual Force Decomposition"]
+        F --> H1["CLV Regression Model: Gradient Boosting Regressor"]
+        H1 --> H2["Pareto 80/20 Concentration Engine"]
     end
 
     subgraph Retention_Optimization["4. Prescriptive Retention Optimization"]
-        G2 --> I[Rule-Based Decision Engine]
+        G2 --> I["Rule-Based Decision Engine"]
         H1 --> I
         G4 --> I
-        I --> J1[Prioritized Customer Action Roster]
-        I --> J2[Interactive What-If ROI Simulator]
+        I --> J1["Prioritized Customer Action Roster"]
+        I --> J2["Interactive What-If ROI Simulator"]
     end
 
     subgraph MLOps_Governance["5. MLOps & Orchestration Layer"]
-        K1[Apache Airflow DAG] --> B
+        K1["Apache Airflow DAG"] --> B
         K1 --> G1
-        G1 --> K2[MLflow Tracking Registry]
-        F --> K3[Statistical Data Drift Monitor<br>PSI & Kolmogorov-Smirnov Tests]
+        G1 --> K2["MLflow Tracking Registry"]
+        F --> K3["Statistical Data Drift Monitor: PSI & KS Tests"]
     end
 
     subgraph Reporting_Presentation["6. Analytics & User Interface Layer"]
-        J1 --> L1[Multi-Page Streamlit Enterprise App]
+        J1 --> L1["Multi-Page Streamlit Enterprise App"]
         J2 --> L1
         E1 --> L1
-        D --> L2[Power BI Star Schema Analytical Mart<br>CSV / Parquet Exports + DAX Measures]
+        D --> L2["Power BI Star Schema Mart: CSV / Parquet + DAX"]
     end
 ```
 
